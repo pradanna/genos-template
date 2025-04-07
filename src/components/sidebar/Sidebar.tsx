@@ -1,9 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { Collapse } from "@material-tailwind/react";
 import SidebarTooltip from "./SidebarTooltip";
 
 export type SidebarItem = {
@@ -34,23 +33,31 @@ export default function Sidebar({
     setOpen(open === name ? null : name);
   };
 
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   return (
-    <aside
-      className={`h-screen bg-white border-r transition-all duration-300 ${
+    <div
+      className={`h-screen bg-white transition-all duration-300 z-20 shadow-sm shadow-light2 ${
         isSidebarOpen ? "w-64" : "w-20"
       }`}
     >
       <div className="p-4">
-        <Image
-          src={isSidebarOpen ? logoExtended : logoSimple}
-          alt="Logo"
-          width={isSidebarOpen ? 200 : 50}
-          height={50}
-          className="object-contain"
-        />
+        {isHydrated && (
+          <Image
+            src={isSidebarOpen ? logoExtended : logoSimple}
+            alt="Logo"
+            width={isSidebarOpen ? 200 : 50}
+            height={50}
+            className="object-contain"
+          />
+        )}
       </div>
 
-      <ul className="space-y-1 px-2">
+      <ul className="space-y-1 ps-3 pt-5">
         {menuItems.map((item) => {
           const hasChildren = item.children && item.children.length > 0;
           const isOpen = open === item.name;
@@ -85,8 +92,14 @@ export default function Sidebar({
                       )}
                     </button>
                   </SidebarTooltip>
-                  <Collapse open={isOpen}>
-                    <ul className="pl-10">
+
+                  {/* Submenu Collapse */}
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      isOpen ? "max-h-96" : "max-h-0"
+                    }`}
+                  >
+                    <ul className=" py-1">
                       {item.children?.map((child) => (
                         <li key={child.name}>
                           <Link href={child.href}>
@@ -109,7 +122,7 @@ export default function Sidebar({
                         </li>
                       ))}
                     </ul>
-                  </Collapse>
+                  </div>
                 </>
               ) : (
                 <Link href={item.href}>
@@ -134,6 +147,6 @@ export default function Sidebar({
           );
         })}
       </ul>
-    </aside>
+    </div>
   );
 }

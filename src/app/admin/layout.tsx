@@ -26,7 +26,6 @@ import {
 import ProfileDropdown from "@/components/dropdown-button/ProfileDropdown";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import router from "next/router";
-import { Button, Tooltip } from "@material-tailwind/react";
 import NavbarAdmin from "@/components/navbar/NavbarAdmin";
 
 export default function DashboardLayout({

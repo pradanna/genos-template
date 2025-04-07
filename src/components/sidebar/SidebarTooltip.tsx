@@ -1,5 +1,4 @@
 import React from "react";
-import { Tooltip } from "@material-tailwind/react";
 
 type SidebarTooltipProps = {
   isSidebarOpen: boolean;
@@ -13,14 +12,17 @@ export default function SidebarTooltip({
   content,
 }: SidebarTooltipProps) {
   return (
-    <Tooltip
-      placement="right"
-      className={`rounded-r-full rounded-l-none bg-primary-light3 px-4 py-3 -ms-2 z-0 ${
-        !isSidebarOpen ? "" : "hidden"
-      }`}
-      content={<span className="text-black font-bold">{content}</span>}
-    >
+    <div className={`relative group ${isSidebarOpen ? "" : "block"}`}>
       {children}
-    </Tooltip>
+
+      {/* Tooltip muncul jika sidebar tertutup */}
+      {!isSidebarOpen && (
+        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
+          <div className="bg-primary-light3 text-black font-bold text-sm px-3 py-2 rounded-r-full  whitespace-nowrap -ms-3">
+            {content}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

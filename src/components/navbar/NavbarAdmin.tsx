@@ -6,14 +6,6 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Typography,
-  Avatar,
-  Card,
-} from "@material-tailwind/react";
 
 type NavbarProps = {
   onToggleSidebar: () => void;
@@ -34,12 +26,12 @@ export default function NavbarAdmin({
   const [profileOpen, setProfileOpen] = useState(false);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-white shadow-md">
+    <div className="flex items-center justify-between px-4 py-3 bg-white  relative z-40">
       {/* Left - Sidebar Toggle + Page Title */}
       <div className="flex items-center gap-4">
         <button
           onClick={onToggleSidebar}
-          className="text-black hover:text-gray-600 transition-all duration-300"
+          className="text-black hover:text-gray-600 transition-all duration-300 cursor-pointer"
         >
           {isSidebarOpen ? (
             <XMarkIcon className="h-5 w-5 rotate-180 text-dark3" />
@@ -55,70 +47,83 @@ export default function NavbarAdmin({
       {/* Right - Notification & Profile */}
       <div className="flex items-center gap-4">
         {/* Notification */}
-        <Menu open={notifOpen} handler={setNotifOpen} placement="bottom-end">
-          <Button
+        <div className="relative">
+          <button
             onClick={() => setNotifOpen((prev) => !prev)}
-            variant="text"
-            className="p-1"
+            className="p-1 cursor-pointer hover:bg-gray-100 rounded-full transition "
           >
             <BellIcon className="h-6 w-6 text-gray-700" />
-          </Button>
+          </button>
           {notifOpen && (
-            <div className="absolute z-50 mt-2 w-72 bg-white rounded-md shadow-md border">
+            <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-md border z-50">
               <div className="px-4 py-2 border-b">
-                <Typography variant="small" className="text-gray-700">
+                <span className="text-sm font-semibold text-gray-700">
                   Notifikasi
-                </Typography>
+                </span>
               </div>
-              <MenuItem onClick={() => setNotifOpen(false)}>
+              <div
+                onClick={() => setNotifOpen(false)}
+                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
+              >
                 🔔 Notifikasi 1
-              </MenuItem>
-              <MenuItem onClick={() => setNotifOpen(false)}>
+              </div>
+              <div
+                onClick={() => setNotifOpen(false)}
+                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
+              >
                 📦 Pesanan baru
-              </MenuItem>
-              <MenuItem onClick={() => setNotifOpen(false)}>
+              </div>
+              <div
+                onClick={() => setNotifOpen(false)}
+                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
+              >
                 💬 Chat masuk
-              </MenuItem>
+              </div>
             </div>
           )}
-        </Menu>
+        </div>
 
         {/* Profile Dropdown */}
-        <Menu
-          open={profileOpen}
-          handler={setProfileOpen}
-          placement="bottom-end"
-        >
-          <Button
+        <div className="relative">
+          <button
             onClick={() => setProfileOpen((prev) => !prev)}
-            variant="text"
-            className="p-0"
+            className="p-0 focus:outline-none cursor-pointer"
           >
-            <Avatar
+            <Image
               src={profileImage}
               alt="Profile"
-              size="sm"
-              className="border border-gray-300"
+              width={32}
+              height={32}
+              className="rounded-full border border-gray-300"
             />
-          </Button>
+          </button>
           {profileOpen && (
-            <div className="absolute z-50 mt-2 w-56 bg-white rounded-md shadow-md border">
-              <Card shadow={false} className="p-4 border-b">
-                <Typography variant="h6" className="mb-1">
-                  {profileName}
-                </Typography>
-                <Typography variant="small" color="gray">
-                  Admin
-                </Typography>
-              </Card>
-              <MenuItem onClick={() => setProfileOpen(false)}>
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-md border z-50">
+              <div className="p-4 border-b">
+                <p className="font-semibold text-gray-800">{profileName}</p>
+                <p className="text-sm text-gray-500">Admin</p>
+              </div>
+              <div
+                onClick={() => setProfileOpen(false)}
+                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
+              >
                 Profil Saya
-              </MenuItem>
-              <MenuItem onClick={() => setProfileOpen(false)}>Akun</MenuItem>
-              <MenuItem onClick={() => setProfileOpen(false)}>Logout</MenuItem>
+              </div>
+              <div
+                onClick={() => setProfileOpen(false)}
+                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
+              >
+                Akun
+              </div>
+              <div
+                onClick={() => setProfileOpen(false)}
+                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
+              >
+                Logout
+              </div>
             </div>
           )}
-        </Menu>
+        </div>
       </div>
     </div>
   );
