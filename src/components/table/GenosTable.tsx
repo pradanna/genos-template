@@ -2,8 +2,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  MagnifyingGlassCircleIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import GenosTextfield from "../form/GenosTextfield";
+import GenosPagination from "../pagination/GenosPagination";
 
 type TableHead = {
   key: string;
@@ -23,43 +29,72 @@ type GenosTableProps = {
   CHECKBOXS?: boolean;
   SORT?: boolean;
   PAGINATION?: boolean;
-  SEARCH?: boolean;
+  FILTER?: React.ReactNode;
   ACTION_BUTTON?: ActionType;
+  fontSize?: "xs" | "sm" | "md" | "lg" | "xl";
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
+  onSortChange?: (key: string, order: "asc" | "desc") => void;
+  totalRows?: number;
+  rowsPerPage?: number;
+};
+
+const fontSizeMap = {
+  xs: "text-xs",
+  sm: "text-sm",
+  md: "text-md",
+  lg: "text-lg",
+  xl: "text-xl",
 };
 
 export default function GenosTable({
   TABLE_HEAD,
   TABLE_ROWS,
   CHECKBOXS = false,
+  rowsPerPage = 10,
+  onPageChange,
   SORT = false,
   PAGINATION = false,
-  SEARCH = false,
+  currentPage,
+  totalRows,
+  onSortChange,
+  FILTER,
+  fontSize = "sm",
   ACTION_BUTTON,
 }: GenosTableProps) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [stateCurrentPage, setStateCurrentPage] = useState<number>(1);
+
+  const internalCurrentPage = onPageChange
+    ? currentPage || 1
+    : stateCurrentPage;
+  const internalRowsPerPage = rowsPerPage || 10;
+
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
-
   const handleSort = (key: string) => {
+    let newOrder: "asc" | "desc" = "asc";
     if (sortKey === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortOrder("asc");
+      newOrder = sortOrder === "asc" ? "desc" : "asc";
+    }
+    setSortKey(key);
+    setSortOrder(newOrder);
+
+    if (onSortChange) {
+      onSortChange(key, newOrder);
     }
   };
 
-  const filteredRows = TABLE_ROWS.filter((row) =>
-    Object.values(row).some((val) =>
-      String(val).toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const handlePageChange = (page: number) => {
+    if (onPageChange) {
+      onPageChange(page);
+    } else {
+      setStateCurrentPage(page);
+    }
+  };
 
   const sortedRows = sortKey
-    ? [...filteredRows].sort((a, b) => {
+    ? [...TABLE_ROWS].sort((a, b) => {
         const aVal = a[sortKey];
         const bVal = b[sortKey];
         return sortOrder === "asc"
@@ -70,40 +105,43 @@ export default function GenosTable({
           ? 1
           : -1;
       })
-    : filteredRows;
+    : TABLE_ROWS;
 
-  const paginatedRows = PAGINATION
-    ? sortedRows.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
-      )
-    : sortedRows;
+  const paginatedRows =
+    PAGINATION && !onPageChange // frontend pagination
+      ? sortedRows.slice(
+          (internalCurrentPage - 1) * internalRowsPerPage,
+          internalCurrentPage * internalRowsPerPage
+        )
+      : sortedRows; // backend pagination, tidak slice lagi
 
-  const totalPages = Math.ceil(sortedRows.length / rowsPerPage);
+  const totalPages = Math.ceil(
+    (totalRows || sortedRows.length) / internalRowsPerPage
+  );
+
+  console.log("totalRows:", totalRows);
+  console.log("sortedRows.length:", sortedRows.length);
+  console.log("totalPages:", totalPages);
 
   return (
     <div className="w-full">
-      {SEARCH && (
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-3 py-2 border rounded w-full"
-          />
-        </div>
-      )}
+      {FILTER && <div className="mb-4">{FILTER}</div>}
       <div className="overflow-auto">
-        <table className="w-full table-auto border-collapse">
+        <table
+          className={clsx(
+            "w-full table-auto border-collapse",
+            fontSizeMap[fontSize]
+          )}
+        >
           <thead>
-            <tr className="border-b border-light2">
+            <tr className={clsx("border-b border-light2")}>
               {CHECKBOXS && <th className="p-3"></th>}
               {TABLE_HEAD.map((head) => (
                 <th
                   key={head.key}
                   className={clsx(
                     "p-3 text-left font-semibold",
+
                     head.sortable && "cursor-pointer"
                   )}
                   onClick={() => SORT && head.sortable && handleSort(head.key)}
@@ -176,28 +214,19 @@ export default function GenosTable({
           </tbody>
         </table>
       </div>
-      {PAGINATION && totalPages > 1 && (
-        <div className="flex justify-end gap-2 mt-4">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-1 border rounded"
-          >
-            Prev
-          </button>
-          <span className="px-2 py-1">
-            {currentPage} / {totalPages}
-          </span>
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 border rounded"
-          >
-            Next
-          </button>
-        </div>
+      {PAGINATION && (
+        <GenosPagination
+          delta={2}
+          showFirstLast
+          currentPage={internalCurrentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
+
+      {/* Info jika kosong */}
+      {TABLE_ROWS.length === 0 && (
+        <div className="text-center text-gray-500 py-4">No data found.</div>
       )}
     </div>
   );

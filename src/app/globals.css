@@ -42,6 +42,8 @@
 
   --color-light1: #f8f9fa;
   --color-light2: #e9ecef;
+
+  --color-border-pagination: #ddd;
 }
 
 .shadow-right-soft {

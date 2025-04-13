@@ -8,6 +8,7 @@ type PanelProps = {
   subtitle?: string;
   padding?: PaddingSize;
   children: React.ReactNode;
+  actionChildren?: React.ReactNode;
   className?: string;
 };
 
@@ -22,6 +23,7 @@ export default function GenosPanel({
   subtitle,
   padding = "p-md",
   children,
+  actionChildren,
   className = "",
 }: PanelProps) {
   const showHeader = title || subtitle;
@@ -30,20 +32,25 @@ export default function GenosPanel({
     <div
       className={clsx(
         "bg-white rounded-lg shadow-sm  overflow-hidden ",
+        paddingMap[padding],
         className
       )}
     >
       {showHeader && (
-        <div className="px-5 pt-4 pb-2">
-          {title && <h2 className="text-lg font-semibold">{title}</h2>}
-          {subtitle && (
-            <p className="text-sm text-gray-500  font-light">{subtitle}</p>
-          )}
-          <hr className="mt-3 border-t border-gray-100" />
+        <div className="flex justify-between items-center">
+          <div className=" pb-2">
+            {title && <h2 className="text-lg font-semibold">{title}</h2>}
+            {subtitle && (
+              <p className="text-sm text-gray-500  font-light">{subtitle}</p>
+            )}
+            <hr className="mt-3 border-t border-gray-100" />
+          </div>
+
+          {actionChildren}
         </div>
       )}
 
-      <div className={clsx(paddingMap[padding])}>{children}</div>
+      <div>{children}</div>
     </div>
   );
 }

@@ -42,7 +42,7 @@ export default function Sidebar({
   return (
     <div
       className={`h-screen bg-white transition-all duration-300 z-20 shadow-sm shadow-light2 ${
-        isSidebarOpen ? "w-64" : "w-20"
+        isSidebarOpen ? "w-64" : "w-16"
       }`}
     >
       <div className="p-4">

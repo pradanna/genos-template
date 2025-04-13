@@ -54,7 +54,7 @@ export default function GenosTextfield({
         className={clsx(
           "flex items-center border rounded-md transition-all duration-200",
           disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white",
-          "border-light2 focus-within:border-primary-color"
+          "border-light2 focus-within:border-primary-light2"
         )}
       >
         {is_icon_left && (
